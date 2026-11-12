@@ -1,0 +1,755 @@
+/* ==========================================================================
+   Patte mein basa Suraj — Madhubani animatic (9:16, 1:15)
+   Built on top of the Paperfold JS repo. No build step, no external assets.
+   ========================================================================== */
+
+:root {
+  --ink: #1d1610;
+  --ivory: #f7eeda;
+  --gold: #e8b04b;
+  --saffron: #f2a03d;
+  --vermilion: #cf3f2e;
+  --terracotta: #b4471f;
+  --leaf: #2f6b45;
+  --indigo: #18213d;
+  --night: #0d1226;
+  --river: #2a6f7a;
+  --panel: #161310;
+  --panel-2: #1f1a16;
+  --line: rgba(247, 238, 218, 0.12);
+  --muted: rgba(247, 238, 218, 0.55);
+  --font: "Mukta", "Noto Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --deva: "Noto Sans Devanagari", "Mukta", "Nirmala UI", "Kohinoor Devanagari", serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 18% 0%, #2a2118 0%, transparent 60%),
+    radial-gradient(900px 700px at 100% 100%, #1b2622 0%, transparent 55%),
+    #0b0907;
+  color: var(--ivory);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- shell -- */
+
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 0;
+}
+
+.stage-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.stage {
+  position: relative;
+  height: min(92vh, 980px);
+  aspect-ratio: 9 / 16;
+  max-width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ivory);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.06) inset,
+    0 40px 90px -30px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(232, 176, 75, 0.28),
+    0 0 60px -10px rgba(232, 176, 75, 0.18);
+  isolation: isolate;
+  container-type: inline-size;
+}
+
+/* paper grain over the whole frame */
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='.12'/></feComponentTransfer></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+}
+
+.scenes {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+}
+
+.scene.on {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* the paperfold transition: the incoming shot unfolds upward like a leaf */
+.scene.fold-in {
+  animation: foldIn 720ms cubic-bezier(0.22, 0.72, 0.16, 1) both;
+}
+
+@keyframes foldIn {
+  0% {
+    transform: perspective(1400px) rotateX(-91deg);
+    opacity: 0.2;
+    filter: brightness(0.45) saturate(0.7);
+  }
+  55% { opacity: 1; }
+  100% {
+    transform: perspective(1400px) rotateX(0deg);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+/* hard shadow that sweeps down the fold line */
+.fold-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 9, 6, 0.85) 0%,
+    rgba(13, 9, 6, 0.45) 34%,
+    rgba(13, 9, 6, 0) 62%
+  );
+}
+
+.fold-shade.run { animation: foldShade 720ms ease-out both; }
+
+@keyframes foldShade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* shape-rendering: keep the inks crisp, the fills flat */
+.scene svg * { transform-box: fill-box; }
+
+/* --------------------------------------------------------- shot overlay -- */
+
+.shot-id {
+  position: absolute;
+  top: 3.2%;
+  left: 5%;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: clamp(8px, 2.5cqi, 13px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(29, 22, 16, 0.6);
+  font-weight: 600;
+  transition: opacity 0.25s ease;
+}
+
+.shot-id b {
+  font-weight: 800;
+  color: var(--vermilion);
+}
+
+.cue {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 4.2%;
+  z-index: 35;
+  transition: opacity 0.25s ease;
+}
+
+.cue .cue-line {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.5em 0.8em;
+  font-size: clamp(9px, 2.9cqi, 15px);
+  line-height: 1.35;
+  color: #f7eeda;
+  background: rgba(24, 18, 13, 0.72);
+  border-left: 3px solid var(--gold);
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+  font-weight: 500;
+}
+
+.cue .cue-line em {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.app.captions-off .shot-id,
+.app.captions-off .cue { opacity: 0; }
+
+/* ------------------------------------------------------------ titlecard -- */
+
+.titlecard {
+  position: absolute;
+  inset: 0;
+  z-index: 36;
+  display: grid;
+  place-content: center;
+  gap: 0.55em;
+  text-align: center;
+  padding: 8%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.titlecard.show { animation: titleIn 1200ms ease both; }
+
+@keyframes titleIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.titlecard .deva {
+  font-family: var(--deva);
+  font-size: clamp(20px, 7.8cqi, 46px);
+  line-height: 1.35;
+  color: #fdf6e5;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 0 26px rgba(242, 160, 61, 0.55);
+  font-weight: 700;
+}
+
+.titlecard .deva span { color: var(--gold); }
+
+.titlecard .en {
+  font-size: clamp(8px, 2.5cqi, 12px);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(247, 238, 218, 0.8);
+}
+
+/* --------------------------------------------------------------- panel --- */
+
+.panel {
+  border-left: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(31, 26, 22, 0.96), rgba(18, 15, 12, 0.98));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  backdrop-filter: blur(14px);
+}
+
+.panel-head {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.7;
+}
+
+h1 {
+  font-family: var(--deva);
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 8px 0 4px;
+  color: #fbf3e2;
+  font-weight: 700;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sub b { color: rgba(247, 238, 218, 0.85); font-weight: 600; }
+
+/* transport */
+.transport {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+}
+
+.time-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-row .now { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+.time-row .now small { color: var(--muted); font-weight: 500; }
+.time-row .cue-name {
+  font-size: 10.5px;
+  color: var(--muted);
+  max-width: 55%;
+  text-align: right;
+  line-height: 1.35;
+}
+
+.scrub {
+  position: relative;
+  height: 26px;
+  display: flex;
+  align-items: center;
+}
+
+.scrub input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  margin: 0;
+  border-radius: 99px;
+  background: rgba(247, 238, 218, 0.16);
+  outline: none;
+  cursor: pointer;
+}
+
+.scrub input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #2a2118;
+  box-shadow: 0 0 0 3px rgba(232, 176, 75, 0.22);
+  cursor: grab;
+}
+
+.scrub input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #2a2118;
+  cursor: grab;
+}
+
+.ticks {
+  position: absolute;
+  inset: auto 0 2px 0;
+  height: 4px;
+  pointer-events: none;
+}
+
+.ticks i {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 4px;
+  background: rgba(247, 238, 218, 0.32);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid rgba(247, 238, 218, 0.16);
+  background: rgba(247, 238, 218, 0.05);
+  color: var(--ivory);
+  height: 32px;
+  min-width: 34px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover { background: rgba(247, 238, 218, 0.1); border-color: rgba(247, 238, 218, 0.28); }
+.btn:active { transform: translateY(1px); }
+
+.btn.play {
+  flex: 1;
+  height: 38px;
+  background: linear-gradient(180deg, #f0b656, #dd9c34);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #241a12;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.btn.play:hover { background: linear-gradient(180deg, #f7c268, #e6a53c); }
+
+.btn.icon { padding: 0; width: 34px; }
+
+.btn[aria-pressed="true"] {
+  background: rgba(232, 176, 75, 0.18);
+  border-color: rgba(232, 176, 75, 0.5);
+  color: var(--gold);
+}
+
+.spacer { flex: 1; }
+
+/* now-playing card */
+.card {
+  margin: 14px 20px;
+  padding: 13px 14px;
+  border: 1px solid rgba(232, 176, 75, 0.26);
+  border-radius: 10px;
+  background: linear-gradient(160deg, rgba(232, 176, 75, 0.1), rgba(232, 176, 75, 0.02));
+}
+
+.card .k {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.card .v {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(247, 238, 218, 0.92);
+}
+
+.card .v strong { color: #fff6e2; }
+
+/* shotlist */
+.shotlist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 20px 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.shotlist {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 0 12px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(247, 238, 218, 0.2) transparent;
+}
+
+.shotlist::-webkit-scrollbar { width: 8px; }
+.shotlist::-webkit-scrollbar-thumb {
+  background: rgba(247, 238, 218, 0.16);
+  border-radius: 99px;
+}
+
+.shot {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.shot:hover { background: rgba(247, 238, 218, 0.05); }
+
+.shot.active { background: rgba(232, 176, 75, 0.12); }
+
+.shot.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+}
+
+.shot .t {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  padding-top: 1px;
+  letter-spacing: 0.02em;
+}
+
+.shot.active .t { color: var(--gold); }
+
+.shot .n {
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(247, 238, 218, 0.86);
+}
+
+.shot .n small {
+  display: block;
+  font-size: 10.5px;
+  color: rgba(247, 238, 218, 0.44);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.panel-foot {
+  padding: 10px 20px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: rgba(247, 238, 218, 0.45);
+}
+
+.panel-foot b { color: rgba(247, 238, 218, 0.72); font-weight: 600; }
+.panel-foot kbd {
+  font: inherit;
+  font-size: 10px;
+  padding: 1px 4px;
+  border: 1px solid rgba(247, 238, 218, 0.2);
+  border-radius: 4px;
+  color: rgba(247, 238, 218, 0.7);
+}
+
+/* clean / recording mode */
+.app.clean { grid-template-columns: minmax(0, 1fr); }
+.app.clean .panel { display: none; }
+.app.clean .stage-wrap { padding: 0; background: #0b0907; }
+.app.clean .stage {
+  height: 100vh;
+  max-height: 100vh;
+  aspect-ratio: auto;
+  width: min(100vw, calc(100vh * 9 / 16));
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.clean-hint {
+  position: fixed;
+  right: 14px;
+  bottom: 12px;
+  z-index: 99;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(247, 238, 218, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.app.clean .clean-hint { opacity: 1; }
+
+/* ------------------------------------------------------------ svg anim -- */
+
+.scene:not(.on) * { animation-play-state: paused !important; }
+
+[data-at] { opacity: var(--p, 0); }
+
+.bob { animation: bob 3.2s ease-in-out infinite; }
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-9px) rotate(-0.6deg); }
+}
+
+.sway { animation: sway 6s ease-in-out infinite; }
+@keyframes sway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+.drift { animation: drift 7s ease-in-out infinite; }
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10px, -12px); }
+}
+
+.flicker { animation: flicker 1.6s ease-in-out infinite; }
+@keyframes flicker {
+  0%, 100% { transform: scale(1) translateY(0); opacity: 1; }
+  25% { transform: scale(1.06, 0.95) translateY(-1px); opacity: 0.94; }
+  55% { transform: scale(0.96, 1.07) translateY(1px); opacity: 1; }
+  75% { transform: scale(1.03, 0.98); opacity: 0.9; }
+}
+
+.glowpulse { animation: glowpulse 3.4s ease-in-out infinite; }
+@keyframes glowpulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+.twinkle { animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.ripple { animation: ripple 4.2s ease-out infinite; transform-origin: center; }
+@keyframes ripple {
+  0% { transform: scale(0.45); opacity: 0.85; }
+  70% { opacity: 0.25; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.wave { animation: wave 6.5s linear infinite; }
+@keyframes wave {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-160px); }
+}
+
+.scrollstrip { animation: scrollstrip 9s linear infinite; }
+@keyframes scrollstrip {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1080px); }
+}
+
+.sink { animation: sink 6.4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes sink {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(96px); opacity: 0.9; }
+}
+
+.grow { animation: grow 8s cubic-bezier(0.2, 0.7, 0.2, 1) infinite; }
+@keyframes grow {
+  0% { transform: scale(0.86); }
+  100% { transform: scale(1.14); }
+}
+
+.rayturn { animation: rayturn 60s linear infinite; transform-origin: center; }
+@keyframes rayturn {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ray-sweep { animation: raySweep 5.6s ease-in-out infinite; }
+@keyframes raySweep {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+/* the great sun folding back into the drop (shot 12 → loop) */
+.collapse {
+  transform-box: view-box;
+  transform-origin: 620px 900px;
+  animation: collapse 2s cubic-bezier(0.55, 0, 0.25, 1) both;
+}
+
+@keyframes collapse {
+  0% { transform: scale(1.5); opacity: 0.9; }
+  72% { opacity: 0.95; }
+  100% { transform: scale(0.12); opacity: 0; }
+}
+
+.paper-lift { animation: paperLift 7s ease-in-out infinite; }
+@keyframes paperLift {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-10px) rotate(-0.2deg); }
+}
+
+.floatup { animation: floatUp 5.5s ease-in-out infinite; }
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene * { animation: none !important; }
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .app { grid-template-columns: 1fr; grid-template-rows: auto auto; height: auto; min-height: 100%; }
+  .stage-wrap { padding: 12px; }
+  .stage { height: auto; width: min(100%, 520px); }
+  .panel { border-left: 0; border-top: 1px solid var(--line); }
+  .shotlist { max-height: 260px; }
+  .app.clean .stage { height: 100vh; width: min(100vw, calc(100vh * 9 / 16)); }
+}
+
+/* ------------------------------------------------------------ extra anim -- */
+
+/* scene-level camera push (kept very small) */
+.cam {
+  transform-box: view-box;
+  transform-origin: 55% 62%;
+  animation: camPush 9s ease-in-out infinite alternate;
+}
+
+@keyframes camPush {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+
+/* rotating rays + growing suns need the SVG viewport as their origin box */
+.rayturn { transform-box: view-box; }
+.grow { transform-box: view-box; }
+
+/* staged entrances (soop items, small props) */
+.enter {
+  transform: translateY(calc((1 - var(--p, 0)) * 26px));
+  opacity: var(--p, 0);
+  transition: none;
+}
+
+body.idle,
+body.idle * { cursor: none; }
+
+/* keep the fold animation snappy on short shots */
+@media (prefers-reduced-motion: reduce) {
+  .scene.fold-in { animation-duration: 1ms !important; }
+  .cam { animation: none !important; }
+}

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Patte mein basa Suraj — Madhubani animatic</title>
+    <meta name="description" content="A 1:15 vertical Madhubani animatic for Chhath — built with the Paperfold JS repo." />
+    <link rel="stylesheet" href="reel.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <div class="stage-wrap">
+        <div class="stage" id="stage" aria-label="9 by 16 animatic preview">
+          <div class="scenes" id="scenes"></div>
+          <div class="fold-shade" id="foldShade"></div>
+          <div class="shot-id" id="shotId"><b>01 / 12</b><span id="shotName">Kelwa ke paat</span></div>
+          <div class="cue" id="cue"><span class="cue-line" id="cueLine"></span></div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <header class="panel-head">
+          <div class="eyebrow">Madhubani animatic · 9:16</div>
+          <h1>पत्ते में बसा सूरज</h1>
+          <p class="sub">
+            <b>1:15</b> · 12 shots · Chhath geet: “Kelwa ke paat par ugelan Suraj Dev”
+            <br />Sharda Sinha ji · use the official audio inside Instagram.
+          </p>
+        </header>
+
+        <section class="transport">
+          <div class="time-row">
+            <div class="now"><span id="now">0:00</span> <small>/ 1:15</small></div>
+            <div class="cue-name" id="cueName">Kelwa ke paat</div>
+          </div>
+          <div class="scrub">
+            <input id="scrub" type="range" min="0" max="75" step="0.01" value="0" aria-label="Timeline" />
+            <div class="ticks" id="ticks"></div>
+          </div>
+          <div class="controls">
+            <button class="btn icon" id="prev" title="Previous shot ([)">◀</button>
+            <button class="btn play" id="play">▶ Play</button>
+            <button class="btn icon" id="next" title="Next shot (])">▶</button>
+            <button class="btn icon" id="restart" title="Restart (R)">⟲</button>
+            <button class="btn icon" id="export" title="Save this frame as PNG (P)">⤓</button>
+            <button class="btn icon" id="clean" title="Hide UI / record mode (H)">⤢</button>
+          </div>
+        </section>
+
+        <div class="card">
+          <div class="k">Now showing · <span id="nowRange">0:00 – 0:04</span></div>
+          <div class="v"><strong id="nowTitle">Kelwa ke paat</strong> — <span id="nowCue"></span></div>
+        </div>
+
+        <div class="shotlist-head">
+          <span>Storyboard</span>
+          <span id="shotCount">12 shots</span>
+        </div>
+        <div class="shotlist" id="shotlist"></div>
+
+        <footer class="panel-foot">
+          <b>Keys</b> <kbd>space</kbd> play · <kbd>←</kbd><kbd>→</kbd> seek · <kbd>[</kbd><kbd>]</kbd> shots ·
+          <kbd>H</kbd> clean · <kbd>C</kbd> captions · <kbd>P</kbd> export frame
+          <br /><b>Note</b> — no music is embedded (copyright). Play the track on your phone, then hit
+          <em>Play</em> and screen-record the clean frame.
+        </footer>
+      </aside>
+    </div>
+
+    <div class="clean-hint">H · show UI &nbsp;·&nbsp; space · play</div>
+
+    <script src="scenes.js"></script>
+    <script src="reel.js"></script>
+  </body>
+</html>

@@ -21,6 +21,13 @@ $(function() {
 });
 ```
 
+## Animatic demo
+
+[`reel/`](reel/) is a 1:15 vertical Madhubani animatic for a Chhath reel — 12 hand-drawn SVG shots, a
+scrub-able timeline and a paper-fold move between shots. Open [`reel/storyboard.html`](reel/storyboard.html)
+or run `python3 -m http.server 8000 --directory reel`. Shot-by-shot prompts live in
+[`reel/shot-prompts.md`](reel/shot-prompts.md).
+
 ====
 
 [MIT License](LICENSE.md). © Felix Niklas (http://twitter.com/mrflix).
