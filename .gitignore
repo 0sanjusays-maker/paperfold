@@ -4,3 +4,5 @@ js
 node_modules
 reel/media/
 
+reel/scenes.json
+reel/fonts/

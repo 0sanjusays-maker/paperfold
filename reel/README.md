@@ -23,6 +23,27 @@ python3 -m http.server 8000 --directory reel
 | `reel.js` | timeline engine: play/scrub, per-shot entrances, title card, PNG frame export |
 | `shot-prompts.md` | per-shot prompts for image/video models + caption and hashtags |
 
+## Rendered video
+
+A finished render lives at `reel/media/patte-mein-basa-suraj_9x16.mp4` (gitignored, 1080×1920, 30 fps,
+1:15, H.264, silent). To rebuild it:
+
+```bash
+cd reel
+node dump-scenes.js                     # scenes.json from scenes.js
+python3 render.py --preview 0,40,71     # spot-check stills
+python3 render.py --video media/reel.mp4
+```
+
+`render.py` samples the same CSS keyframes the browser runs (fold reveal, flicker, ripples, walk bob,
+camera push, entrance staggers), bakes them into each SVG, rasterises with resvg and pipes PNGs into
+ffmpeg — no browser needed. It wants `pip install resvg-py imageio-ffmpeg` and two TTFs in
+`reel/fonts/` (`NotoSerifDevanagari-Bold.ttf`, `NotoSerifLatin-Bold.ttf`, OFL). Easiest source:
+`npm pack @fontsource/noto-serif-devanagari`, then convert the `-devanagari-700` and `-latin-700`
+`.woff2` files to `.ttf` with `fontTools` (`TTFont(path).save(out)` after `f.flavor = None`).
+
+Full render on 2 cores takes about 16 minutes.
+
 ## Controls
 
 | | |
