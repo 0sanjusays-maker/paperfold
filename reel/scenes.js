@@ -576,24 +576,24 @@
     const p = "s3";
     const items = `
       <g class="enter" data-at="1.2" style="--p:0">
-        <circle cx="-64" cy="-26" r="34" fill="${C.saffron}" stroke="${C.ink}" stroke-width="4"/>
-        <circle cx="-64" cy="-26" r="10" fill="url(#${p}-dots)"/>
+        <circle cx="-64" cy="16" r="34" fill="${C.saffron}" stroke="${C.ink}" stroke-width="4"/>
+        <circle cx="-64" cy="16" r="10" fill="url(#${p}-dots)"/>
       </g>
       <g class="enter" data-at="2.0" style="--p:0">
-        <ellipse cx="18" cy="-34" rx="19" ry="38" fill="${C.leafLight}" stroke="${C.ink}" stroke-width="4"/>
-        <ellipse cx="46" cy="-22" rx="17" ry="32" fill="${C.leaf}" stroke="${C.ink}" stroke-width="4"/>
+        <ellipse cx="18" cy="6" rx="19" ry="38" fill="${C.leafLight}" stroke="${C.ink}" stroke-width="4"/>
+        <ellipse cx="46" cy="18" rx="17" ry="32" fill="${C.leaf}" stroke="${C.ink}" stroke-width="4"/>
       </g>
       <g class="enter" data-at="2.8" style="--p:0">
-        <circle cx="104" cy="-32" r="30" fill="#8a5a34" stroke="${C.ink}" stroke-width="4"/>
-        <path d="M 84 -50 q 20 -12 40 0 M 84 -32 q 20 -12 40 0" stroke="${C.ink}" stroke-width="2.6" fill="none" opacity=".55"/>
+        <circle cx="104" cy="8" r="30" fill="#8a5a34" stroke="${C.ink}" stroke-width="4"/>
+        <path d="M 84 -10 q 20 -12 40 0 M 84 8 q 20 -12 40 0" stroke="${C.ink}" stroke-width="2.6" fill="none" opacity=".55"/>
       </g>
       <g class="enter" data-at="3.6" style="--p:0">
-        <circle cx="-142" cy="-14" r="20" fill="${C.verm}" stroke="${C.ink}" stroke-width="4"/>
-        <circle cx="-104" cy="-8" r="20" fill="${C.gold}" stroke="${C.ink}" stroke-width="4"/>
+        <circle cx="-142" cy="26" r="20" fill="${C.verm}" stroke="${C.ink}" stroke-width="4"/>
+        <circle cx="-104" cy="32" r="20" fill="${C.gold}" stroke="${C.ink}" stroke-width="4"/>
       </g>
       <g class="enter" data-at="4.4" style="--p:0">
-        ${lotus(-16, -30, 30, C.pink)}
-        ${lotus(66, -40, 22, C.ivory)}
+        ${lotus(-16, 14, 30, C.pink)}
+        ${lotus(66, 0, 22, C.ivory)}
       </g>
       <g class="enter" data-at="5.2" style="--p:0">
         ${fish(-10, 46, 0.36, C.gold, false)}
@@ -627,11 +627,11 @@
         ${diya(220, 960, 0.52, { p })}
         <path d="M 60 700 L 380 700" stroke="${C.ink}" stroke-width="6"/>
       </g>
-      <g opacity=".55">
-        ${lotus(520, 780, 44, C.verm)}
-        ${lotus(720, 880, 34, C.gold)}
-        ${fish(880, 720, 0.34, C.ivory, false)}
-        ${fish(360, 900, 0.3, C.ivory, true)}
+      <g opacity=".6">
+        ${lotus(520, 760, 46, C.verm)}
+        ${lotus(700, 900, 30, C.gold)}
+        ${fish(300, 950, 0.6, C.ivory, false)}
+        ${fish(905, 690, 0.55, C.ivory, true)}
       </g>
       <!-- hanging marigold garland -->
       <g>
